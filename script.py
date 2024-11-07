@@ -36,7 +36,7 @@ def run_script():
 
     running = True
     current_time = time.strftime("%Y-%m-%d %H:%M:%S")
-    output_text.insert(tk.END, f"{current_time} 提示: 脚本开始运行，每半分钟执行一次。\n")
+    output_text.insert(tk.END, f"{current_time} 提示: 脚本开始运行，每分钟执行一次。\n")
     
     def task():
         while running:
