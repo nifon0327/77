@@ -9,6 +9,14 @@ from PIL import Image, ImageTk
 from pystray import Icon, MenuItem as item, Menu
 import pymysql
 import re
+import configparser
+
+# 创建 ConfigParser 对象
+config = configparser.ConfigParser()
+
+# 使用 open 函数显式指定编码为 UTF-8
+with open('config.ini', 'r', encoding='utf-8') as config_file:
+    config.read_file(config_file)
 
 # 自定义Text类，实现自动滚动
 class AutoScrollText(tk.Text):
@@ -21,10 +29,10 @@ class AutoScrollText(tk.Text):
 
 def get_db_connection():
     return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="123456",
-        database="check_bilibili"
+        host=config['database']['host'],
+        user=config['database']['user'],
+        password=config['database']['password'],
+        database=config['database']['database']
     )
 
 def run_script():
@@ -45,10 +53,10 @@ def run_script():
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                 
                 # 直接使用绝对路径
-                script_path = "C:\\Users\\sh\\Desktop\\sendMail\\check_streamer.php"
+                script_path = config['paths']['script_path']
                 
                 # 确保PHP在系统路径中，或者指定完整路径
-                php_executable = "php"  # 或者 "C:\\path\\to\\php.exe"
+                php_executable = config['paths']['php_executable']  # 或者 "C:\\path\\to\\php.exe"
                 
                 process = subprocess.Popen(
                     [php_executable, script_path],
@@ -70,11 +78,11 @@ def run_script():
                     process.kill()  # 确保子进程被终止
                     process = None  # 释放子进程资源
             
-            # 每半分钟执行一次
-            for _ in range(60):
+            check_interval = int(config['setting']['check_interval'])  # 从配置文件读取检查间隔
+            for _ in range(check_interval):
                 if not running:
                     break
-                time.sleep(1)  # 每次循环休眠1秒，总共休眠30秒
+                time.sleep(1)  # 每次循环休眠1秒，总共休眠 check_interval 秒
 
     threading.Thread(target=task, daemon=True).start()
 
@@ -181,7 +189,7 @@ def add_email():
     dialog = Toplevel(root)
     dialog.title("添加邮箱")
     dialog.configure(bg='#ffb6c1')
-    dialog.iconbitmap("C:\\Users\\sh\\Desktop\\build\\script\\open.ico")
+    dialog.iconbitmap(config['paths']['icon_path'])
 
     # 绑定回车键到 submit 函数
     dialog.bind("<Return>", lambda event: submit())
@@ -235,16 +243,15 @@ tray_icon = None
 
 def minimize_to_tray():
     global tray_icon
-    root.withdraw()
+    root.withdraw()  # 隐藏主窗口
     if tray_icon is not None:
         tray_icon.stop()  # 停止并销毁现有的托盘图标
-        tray_icon = None  # 将 tray_icon 设置为 None
-    tray_icon = threading.Thread(target=create_tray_icon, daemon=True)
-    tray_icon.start() # 启动线程
+    tray_icon_thread = threading.Thread(target=create_tray_icon, daemon=True)
+    tray_icon_thread.start()  # 启动托盘图标线程
 
 def create_tray_icon():
     try:
-        icon_image = Image.open("C:\\Users\\sh\\Desktop\\build\\script\\open.ico")
+        icon_image = Image.open(config['paths']['icon_path'])
     except FileNotFoundError:
         print("图标文件未找到，请检查路径。")
         return
@@ -277,19 +284,19 @@ def create_tray_icon():
             item('退出', exit_application)
         )
 
-    icon = Icon("name", icon_image, "柒月桜", menu=create_menu())
+    global tray_icon
+    tray_icon = Icon("name", icon_image, "柒月桜", menu=create_menu())
 
     # 设置托盘图标的点击事件
-    icon.run(setup=lambda icon: setattr(icon, 'visible', True))
+    tray_icon.run(setup=lambda icon: setattr(icon, 'visible', True))
 
 def show_window(icon, item=None):
     print("显示窗口")
     icon.stop()
-    root.after(0, root.deiconify)
+    root.after(0, root.deiconify)  # 恢复主窗口
 
 def exit_application(icon, item=None):
-    # 直接调用 root.destroy() 以实现与 close_button 相同的功能
-    root.destroy()
+    root.destroy()  # 关闭应用程序
 
 def on_window_state_change(event=None):
     if root.state() == 'iconic':  # 窗口被最小化
@@ -333,7 +340,7 @@ title_bar.bind("<ButtonPress-1>", start_move)
 title_bar.bind("<ButtonRelease-1>", stop_move)
 title_bar.bind("<B1-Motion>", on_motion)
 
-icon_image = Image.open("C:\\Users\\sh\\Desktop\\build\\script\\open.ico")
+icon_image = Image.open(config['paths']['icon_path'])
 icon_photo = ImageTk.PhotoImage(icon_image)
 icon_label = tk.Label(title_bar, image=icon_photo, bg='#ffb6c1')
 icon_label.pack(side=tk.LEFT, padx=5)
@@ -375,7 +382,7 @@ style.configure("Pink.Vertical.TScrollbar",
 style.map("Pink.Vertical.TScrollbar",
           background=[('active', '#ffb7c5')])
 
-background_image = Image.open("C:\\Users\\sh\\Desktop\\build\\script\\back.jpg").convert("RGBA")
+background_image = Image.open(config['paths']['background_image_path']).convert("RGBA")
 alpha = 77
 background_image.putalpha(alpha)
 

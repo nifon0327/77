@@ -25,6 +25,42 @@
 pip install pillow pystray pymysql
 ```
 
+## 配置文件
+
+### config.ini
+
+`config.ini` 文件用于存储应用程序的基本配置，例如数据库连接信息和其他应用程序设置。请确保根据您的环境正确配置此文件。
+
+示例内容：
+```ini
+[database]
+host = localhost
+user = your_username
+password = your_password
+database = your_database
+
+[settings]
+check_interval = 60  # 检查间隔时间，以秒为单位
+```
+
+### sendMail/config.php
+
+`sendMail/config.php` 文件用于配置邮件发送功能。请确保填写正确的SMTP服务器信息和发件人邮箱信息。
+
+示例内容：
+```php
+<?php
+return [
+    'smtp_host' => 'smtp.example.com',
+    'smtp_port' => 587,
+    'smtp_user' => 'your_email@example.com',
+    'smtp_pass' => 'your_email_password',
+    'from_email' => 'your_email@example.com',
+    'from_name' => 'Your Name'
+];
+?>
+```
+
 ## 运行脚本
 
 直接运行 `script.py` 文件即可启动应用程序：
@@ -57,6 +93,8 @@ python script.py
    - `--noconsole` 选项确保应用程序在运行时不显示控制台窗口。
 3. 生成的可执行文件将位于 `dist` 目录中。
 
+4. **注意**：请确保 `config.ini` 文件与生成的可执行文件位于同一目录中，以便应用程序能够正确读取配置。
+
 ## 注意事项
 
 - 确保PHP可执行文件在系统路径中，或者在脚本中指定完整路径。
@@ -66,6 +104,5 @@ python script.py
 ## 许可证
 
 该项目使用MIT许可证。详细信息请参阅LICENSE文件。
-
 
 请根据您的实际需求和环境调整路径和配置。希望这个 `README.md` 文件对您有帮助！如果有其他问题，请随时告诉我。

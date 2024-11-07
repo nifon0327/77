@@ -1,0 +1,6 @@
+config.ini
+sendMail/config.php
+build/
+dist/
+script.spec
+test.py

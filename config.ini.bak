@@ -1,0 +1,21 @@
+# 数据库配置
+[database]
+# 数据库主机地址
+host = your_database_host
+# 数据库用户名
+user = your_database_user
+# 数据库密码
+password = your_database_password
+# 数据库名称
+database = your_database_name
+
+# 路径配置
+[paths]
+# PHP脚本的绝对路径
+script_path = C:\\path\\to\\your\\script\\check_streamer.php
+# PHP可执行文件的路径（如果在系统路径中，可以直接使用 'php'）
+php_executable = php
+# 应用程序图标的路径
+icon_path = C:\\path\\to\\your\\icon\\open.ico
+# 背景图片的路径
+background_image_path = C:\\path\\to\\your\\background\\back.jpg

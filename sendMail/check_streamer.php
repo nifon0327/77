@@ -4,11 +4,13 @@ require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+$config = require 'config.php';
+
 // 数据库配置
-$host = 'localhost'; // 数据库主机
-$dbname = 'check_bilibili'; // 数据库名称
-$username = 'root'; // 数据库用户名
-$password = '123456'; // 数据库密码
+$host = $config['database']['host'];
+$dbname = $config['database']['dbname'];
+$username = $config['database']['username'];
+$password = $config['database']['password'];
 
 // 获取所有主播的 room_id 和 name
 function getRoomInfo($pdo) {
@@ -25,11 +27,12 @@ function getEmailAddressesByRoomId($pdo, $roomId) {
 
 // 获取主播状态
 function getStreamerInfo($url) {
+    global $config;
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_VERBOSE, true); // 启用详细调试信息
-    curl_setopt($ch, CURLOPT_CAINFO, 'C:\Users\sh\Desktop\sendMail\cacert (1).pem'); // 添加指定的证书
+    curl_setopt($ch, CURLOPT_CAINFO, $config['curl']['cacert_path']); // 添加指定的证书
     $response = curl_exec($ch);
 
     if ($response === false) {
@@ -52,19 +55,20 @@ function getStreamerInfo($url) {
 
 // 发送邮件
 function sendEmail($to, $subject, $message) {
+    global $config;
     $mail = new PHPMailer(true);
     try {
         // 服务器设置
         $mail->isSMTP();                                         // 设置使用 SMTP
-        $mail->Host       = 'smtp.126.com';                      // 设置 SMTP 服务器
+        $mail->Host       = $config['smtp']['host'];                      // 设置 SMTP 服务器
         $mail->SMTPAuth   = true;                                // 启用 SMTP 身份验证
-        $mail->Username   = 'aiyigeren0327@126.com';             // SMTP 用户名
-        $mail->Password   = 'YTiWdVaSQmEQjJ9z';                  // SMTP 密码
+        $mail->Username   = $config['smtp']['username'];             // SMTP 用户名
+        $mail->Password   = $config['smtp']['password'];                  // SMTP 密码
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         // 启用 SSL 加密
-        $mail->Port       = 465;                                 // TCP 端口
+        $mail->Port       = $config['smtp']['port'];                                 // TCP 端口
 
         // 收件人设置
-        $mail->setFrom('aiyigeren0327@126.com', '逆风疾行');
+        $mail->setFrom($config['smtp']['from_email'], $config['smtp']['from_name']);
         foreach ($to as $email) {
             $mail->addAddress($email);                           // 添加收件人
         }
