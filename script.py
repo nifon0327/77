@@ -77,7 +77,7 @@ def run_script():
                 if process is not None:
                     process.kill()  # 确保子进程被终止
                     process = None  # 释放子进程资源
-            
+
             check_interval = int(config['setting']['check_interval'])  # 从配置文件读取检查间隔
             for _ in range(check_interval):
                 if not running:
