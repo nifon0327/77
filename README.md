@@ -105,4 +105,38 @@ python script.py
 
 该项目使用MIT许可证。详细信息请参阅LICENSE文件。
 
+## check_bilibili.sql
+
+`check_bilibili.sql` 是一个用于管理和初始化 Bilibili 数据库的 SQL 脚本。该脚本包含多个表的创建和配置，适用于 MySQL 数据库。以下是该脚本中包含的主要表结构：
+
+### 表结构
+
+1. **cb_check_log**
+   - 用于记录检查日志。
+   - 包含字段：`id`（主键），`name`，`room_id`，`message`，`create_time`。
+
+2. **cb_email_list**
+   - 用于存储电子邮件列表。
+   - 包含字段：`id`（主键），`email`，`room_id`，`create_time`。
+
+3. **cb_room_list**
+   - 用于存储房间列表。
+   - 包含字段：`id`（主键），`name`，`room_id`，`create_time`。
+
+4. **cb_room_status**
+   - 用于存储房间状态。
+   - 包含字段：`id`（主键），`room_id`，`status`，`create_time`，`update_time`。
+   - `room_id` 字段具有唯一索引。
+
+### 使用说明
+
+- 在执行该脚本之前，请确保已连接到 MySQL 数据库。
+- 执行脚本将会删除现有的同名表并重新创建。
+- 请根据需要修改表结构和字段。
+
+### 注意事项
+
+- 确保数据库的字符集和排序规则与脚本中的设置一致（`utf8mb4`）。
+- 脚本中设置了 `AUTO_INCREMENT` 的初始值，请根据实际需求调整。
+
 请根据您的实际需求和环境调整路径和配置。希望这个 `README.md` 文件对您有帮助！如果有其他问题，请随时告诉我。
