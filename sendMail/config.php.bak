@@ -1,0 +1,23 @@
+<?php
+return [
+    // 数据库配置
+    'database' => [
+        'host' => 'localhost', // 数据库主机
+        'dbname' => 'your_database_name', // 数据库名称
+        'username' => 'your_username', // 数据库用户名
+        'password' => 'your_password', // 数据库密码
+    ],
+    // SMTP 邮件服务器配置
+    'smtp' => [
+        'host' => 'smtp.example.com', // SMTP 服务器地址
+        'username' => 'your_email@example.com', // SMTP 用户名
+        'password' => 'your_email_password', // SMTP 密码
+        'port' => 465, // SMTP 端口号
+        'from_email' => 'your_email@example.com', // 发件人邮箱
+        'from_name' => 'Your Name', // 发件人名称
+    ],
+    // cURL 配置
+    'curl' => [
+        'cacert_path' => '/path/to/cacert.pem', // cURL CA 证书路径
+    ],
+];

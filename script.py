@@ -375,9 +375,12 @@ style.layout("Pink.Vertical.TScrollbar",
                 'sticky': 'ns'})])
 
 style.configure("Pink.Vertical.TScrollbar", 
-                troughcolor='#ffb6c1', 
+                troughcolor='#ffb6c1',  # 使用现有的粉色
                 background='#ffb6c1', 
-                arrowcolor='#8b0000')
+                arrowcolor='#8b0000',
+                bordercolor='#ff69b4',  # 增加边框颜色
+                lightcolor='#ffb6c1', 
+                darkcolor='#ff69b4')
 
 style.map("Pink.Vertical.TScrollbar",
           background=[('active', '#ffb7c5')])
