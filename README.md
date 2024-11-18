@@ -22,7 +22,7 @@
 在运行该脚本之前，请确保安装了所有必要的Python库。可以使用以下命令安装：
 
 ```bash
-pip install pillow pystray pymysql
+pip install pillow pystray pymysql PyInstaller
 ```
 
 ## 配置文件

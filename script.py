@@ -10,6 +10,7 @@ from pystray import Icon, MenuItem as item, Menu
 import pymysql
 import re
 import configparser
+import os
 
 # 创建 ConfigParser 对象
 config = configparser.ConfigParser()
@@ -47,23 +48,26 @@ def run_script():
     output_text.insert(tk.END, f"{current_time} 提示: 脚本开始运行，每分钟执行一次。\n")
     
     def task():
+        global process
         while running:
+            process = None
             try:
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                 
-                # 直接使用绝对路径
                 script_path = config['paths']['script_path']
+                php_executable = config['paths']['php_executable']
                 
-                # 确保PHP在系统路径中，或者指定完整路径
-                php_executable = config['paths']['php_executable']  # 或者 "C:\\path\\to\\php.exe"
+                if not os.path.exists(php_executable):
+                    raise FileNotFoundError(f"PHP可执行文件未找到: {php_executable}")
+                if not os.path.exists(script_path):
+                    raise FileNotFoundError(f"PHP脚本文件未找到: {script_path}")
                 
                 process = subprocess.Popen(
                     [php_executable, script_path],
                     startupinfo=startupinfo
                 )
-                process.wait()  # 等待子进程完成
-                process = None  # 释放子进程资源
+                process.wait()
                 current_time = time.strftime("%Y-%m-%d %H:%M:%S")
                 output_text.insert(tk.END, f"{current_time} 脚本已执行。\n")
             except FileNotFoundError as fnf_error:
@@ -75,14 +79,22 @@ def run_script():
                 print(f"Exception occurred: {e}")
             finally:
                 if process is not None:
-                    process.kill()  # 确保子进程被终止
-                    process = None  # 释放子进程资源
+                    try:
+                        process.kill()
+                    except:
+                        pass
+                    process = None
 
-            check_interval = int(config['setting']['check_interval'])  # 从配置文件读取检查间隔
+            # 修改这里的配置读取
+            try:
+                check_interval = int(config.get('settings', 'check_interval', fallback=60))
+            except ValueError:
+                check_interval = 60  # 默认值
+            
             for _ in range(check_interval):
                 if not running:
                     break
-                time.sleep(1)  # 每次循环休眠1秒，总共休眠 check_interval 秒
+                time.sleep(1)
 
     threading.Thread(target=task, daemon=True).start()
 

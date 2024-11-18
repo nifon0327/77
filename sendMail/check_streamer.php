@@ -60,12 +60,12 @@ function sendEmail($to, $subject, $message) {
     try {
         // 服务器设置
         $mail->isSMTP();                                         // 设置使用 SMTP
-        $mail->Host       = $config['smtp']['host'];                      // 设置 SMTP 服务器
+        $mail->Host       = $config['smtp']['host'];             // 设置 SMTP 服务器
         $mail->SMTPAuth   = true;                                // 启用 SMTP 身份验证
-        $mail->Username   = $config['smtp']['username'];             // SMTP 用户名
-        $mail->Password   = $config['smtp']['password'];                  // SMTP 密码
+        $mail->Username   = $config['smtp']['username'];         // SMTP 用户名
+        $mail->Password   = $config['smtp']['password'];         // SMTP 密码
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;         // 启用 SSL 加密
-        $mail->Port       = $config['smtp']['port'];                                 // TCP 端口
+        $mail->Port       = $config['smtp']['port'];             // TCP 端口
 
         // 收件人设置
         $mail->setFrom($config['smtp']['from_email'], $config['smtp']['from_name']);
@@ -241,11 +241,23 @@ try {
         $currentStatus = $streamerInfo['online'];
         logStatus($pdo, $roomId, $streamerName, $currentStatus); // 记录当前状态到数据库
         $lastStatus = getLastStatus($pdo, $roomId); // 从数据库获取上次状态
-        $message = "您关注的主播{$streamerName}已开播！<br>
-        直播标题: {$streamerInfo['title']}<br>
-        直播间链接: <a href='https://live.bilibili.com/$roomId'>点击跳转</a><br>
-        <img src='{$streamerInfo['user_cover']}' alt='直播间图片' style='max-width:600px;' onclick=\"window.location.href='https://live.bilibili.com/$roomId';\" style='cursor:pointer;'><br>"; // 添加了点击图片跳转的功能
-        $holidayName = isHoliday(); // 获取节日或节气名称
+        $message = "您关注的主播{$streamerName}已开播！<br><br>
+        <div style='max-width:100%; margin:0 auto;'>
+            <div style='font-size:16px; line-height:1.6;'>
+                <strong>直播标题:</strong> {$streamerInfo['title']}<br>
+                <strong>开播时间:</strong> {$streamerInfo['live_time']}<br>
+                <a href='https://live.bilibili.com/$roomId' style='color:#00a1d6; text-decoration:none;'>
+                    点击进入直播间 →
+                </a>
+            </div>
+            <div style='margin:15px 0;'>
+                <a href='https://live.bilibili.com/$roomId' style='text-decoration:none;'>
+                    <img src='{$streamerInfo['user_cover']}' alt='直播间封面' 
+                        style='width:100%; max-width:600px; height:auto; border-radius:8px; display:block;'>
+                </a>
+            </div>";
+
+        $holidayName = isHoliday();
         if ($holidayName) {
             $solarTermsList = [
                 '立春', '雨水', '惊蛰', '春分', '清明', '谷雨',
@@ -254,12 +266,17 @@ try {
                 '立冬', '小雪', '大雪', '冬至', '小寒', '大寒'
             ];
             if (in_array($holidayName, $solarTermsList)) {
-                $message .= "<br>祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！"; // 添加节气祝福
+                $message .= "<div style='font-size:15px; color:#666; margin-top:15px; padding:10px; background:#f5f5f5; border-radius:5px;'>
+                    祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！
+                </div>";
             } else {
-                $message .= "<br>今天是{$holidayName},别忘了祝主播{$streamerName}{$holidayName}快乐！"; // 添加节日祝福
+                $message .= "<div style='font-size:15px; color:#666; margin-top:15px; padding:10px; background:#f5f5f5; border-radius:5px;'>
+                    今天是{$holidayName}，别忘了祝主播{$streamerName}{$holidayName}快乐！
+                </div>";
             }
         }
-        $message .= "<br>开播时间: {$streamerInfo['live_time']}"; // 添加开播时间
+        
+        $message .= "</div>";
         $emailSubject = "主播 $streamerName 开播通知";
         if ($currentStatus > 0 && $lastStatus == 0) {
             sendEmail($emailTo, $emailSubject, $message); // 发送邮件到多个收件人
