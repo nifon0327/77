@@ -110,7 +110,9 @@ function updateStatus($pdo, $roomId, $status) {
 // 判断是否是节日的函数
 function isHoliday() {
     $today = date('Y-m-d');
-    // 这里添加2024年、2025年、2026年的节日
+    $result = [];
+    
+    // 节日数组
     $holidays = [
         // 2024年
         '2024-01-01' => '元旦',
@@ -140,7 +142,7 @@ function isHoliday() {
         '2026-12-25' => '圣诞节',
     ];
 
-    // 二十四节气
+    // 节气数组
     $solarTerms = [
         // 2024年
         '2024-02-04' => '立春',
@@ -216,12 +218,28 @@ function isHoliday() {
         '2026-12-21' => '冬至',
     ];
 
+    // 检查是否是节日
     if (isset($holidays[$today])) {
-        return $holidays[$today]; // 返回节日名称
-    } elseif (isset($solarTerms[$today])) {
-        return $solarTerms[$today]; // 返回节气名称
+        $result[] = $holidays[$today];
     }
-    return false; // 返回 false
+    
+    // 检查是否是节气
+    if (isset($solarTerms[$today])) {
+        $result[] = $solarTerms[$today];
+    }
+
+    // 如果没有节日和节气，返回 false
+    if (empty($result)) {
+        return false;
+    }
+
+    // 如果有多个节日/节气，返回数组
+    if (count($result) > 1) {
+        return $result;
+    }
+
+    // 如果只有一个节日/节气，返回字符串
+    return $result[0];
 }
 
 // 主逻辑
@@ -249,39 +267,69 @@ try {
     </div>
     
     <div style='background-color:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px;'>
-        <div style='margin-bottom:12px; display:flex; flex-direction:column; gap:5px;'>
-            <span style='color:#666; font-size:clamp(12px, 2.5vw, 14px);'>📺 直播标题：</span>
-            <span style='color:#333; font-weight:bold; font-size:clamp(13px, 2.8vw, 15px); word-break:break-all;'>{$streamerInfo['title']}</span>
+        <div style='margin-bottom:12px; display:flex; align-items:center; gap:10px;'>
+            <span style='color:#666; font-size:clamp(12px, 2.5vw, 14px); white-space:nowrap;'>📺 直播标题：</span>
+            <span style='color:#333; font-weight:bold; font-size:clamp(13px, 2.8vw, 15px);'>{$streamerInfo['title']}</span>
         </div>
-        <div style='margin-bottom:12px; display:flex; flex-direction:column; gap:5px;'>
-            <span style='color:#666; font-size:clamp(12px, 2.5vw, 14px);'>⏰ 开播时间：</span>
+        <div style='margin-bottom:12px; display:flex; align-items:center; gap:10px;'>
+            <span style='color:#666; font-size:clamp(12px, 2.5vw, 14px); white-space:nowrap;'>⏰ 开播时间：</span>
             <span style='color:#333; font-size:clamp(13px, 2.8vw, 15px);'>{$streamerInfo['live_time']}</span>
         </div>
     </div>";
     $holidayName = isHoliday();
     if ($holidayName) {
+        $holidays = [];
+        $solarTerms = [];
+        
+        // 检查是否是节气
         $solarTermsList = [
             '立春', '雨水', '惊蛰', '春分', '清明', '谷雨',
             '立夏', '小满', '芒种', '夏至', '小暑', '大暑',
             '立秋', '处暑', '白露', '秋分', '寒露', '霜降',
             '立冬', '小雪', '大雪', '冬至', '小寒', '大寒'
         ];
-        if (in_array($holidayName, $solarTermsList)) {
-            $message .= "<div style='background:linear-gradient(135deg, #f6f8ff 0%, #f1f5ff 100%); 
-                padding:15px; 
-                border-radius:10px; 
-                margin-top:20px;
-                border-left:4px solid #00a1d6;'>
-                <p style='color:#555; margin:0; font-size:clamp(13px, 2.8vw, 15px);'>🌸 祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！</p>
-            </div>";
+        
+        // 如果是数组，说明同一天有多个节日/节气
+        if (is_array($holidayName)) {
+            foreach ($holidayName as $name) {
+                if (in_array($name, $solarTermsList)) {
+                    $solarTerms[] = $name;
+                } else {
+                    $holidays[] = $name;
+                }
+            }
         } else {
-            $message .= "<div style='background:linear-gradient(135deg, #fff6f6 0%, #fff1f1 100%); 
-                padding:15px; 
-                border-radius:10px; 
-                margin-top:20px;
-                border-left:4px solid #ff6b6b;'>
-                <p style='color:#555; margin:0; font-size:clamp(13px, 2.8vw, 15px);'>🎊 今天是{$holidayName}，别忘了祝主播{$streamerName}{$holidayName}快乐！</p>
-            </div>";
+            if (in_array($holidayName, $solarTermsList)) {
+                $solarTerms[] = $holidayName;
+            } else {
+                $holidays[] = $holidayName;
+            }
+        }
+
+        // 添加节气祝福
+        if (!empty($solarTerms)) {
+            foreach ($solarTerms as $term) {
+                $message .= "<div style='background:linear-gradient(135deg, #f6f8ff 0%, #f1f5ff 100%); 
+                    padding:15px; 
+                    border-radius:10px; 
+                    margin-top:20px;
+                    border-left:4px solid #00a1d6;'>
+                    <p style='color:#555; margin:0; font-size:clamp(13px, 2.8vw, 15px);'>🌸 祝您{$term}快乐，愿您在这个节气里身体健康，万事如意！</p>
+                </div>";
+            }
+        }
+
+        // 添加节日祝福
+        if (!empty($holidays)) {
+            foreach ($holidays as $holiday) {
+                $message .= "<div style='background:linear-gradient(135deg, #fff6f6 0%, #fff1f1 100%); 
+                    padding:15px; 
+                    border-radius:10px; 
+                    margin-top:20px;
+                    border-left:4px solid #ff6b6b;'>
+                    <p style='color:#555; margin:0; font-size:clamp(13px, 2.8vw, 15px);'>🎊 今天是{$holiday}，别忘了祝主播{$streamerName}{$holiday}快乐！</p>
+                </div>";
+            }
         }
     }
     
