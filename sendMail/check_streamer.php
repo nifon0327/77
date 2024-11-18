@@ -244,20 +244,63 @@ try {
         $message = "
 <div style='max-width:600px; margin:0 auto; font-family:Arial,sans-serif; background-color:#ffffff; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1);'>
     <div style='text-align:center; margin-bottom:25px;'>
-        <h2 style='color:#00a1d6; margin:0;'>🎉 开播提醒 🎉</h2>
-        <p style='font-size:18px; color:#333; margin:10px 0;'>您关注的主播 <strong style='color:#00a1d6;'>{$streamerName}</strong> 已开播！</p>
+        <h2 style='color:#00a1d6; margin:0; font-size:clamp(20px, 4vw, 24px);'>🎉 开播提醒 🎉</h2>
+        <p style='font-size:clamp(14px, 3vw, 18px); color:#333; margin:10px 0;'>您关注的主播 <strong style='color:#00a1d6;'>{$streamerName}</strong> 已开播！</p>
     </div>
     
     <div style='background-color:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px;'>
-        <div style='margin-bottom:12px;'>
-            <span style='color:#666;'>📺 直播标题：</span>
-            <span style='color:#333; font-weight:bold;'>{$streamerInfo['title']}</span>
+        <div style='margin-bottom:12px; display:flex; flex-direction:column; gap:5px;'>
+            <span style='color:#666; font-size:clamp(12px, 2.5vw, 14px);'>📺 直播标题：</span>
+            <span style='color:#333; font-weight:bold; font-size:clamp(13px, 2.8vw, 15px); word-break:break-all;'>{$streamerInfo['title']}</span>
         </div>
-        <div style='margin-bottom:12px;'>
-            <span style='color:#666;'>⏰ 开播时间：</span>
-            <span style='color:#333;'>{$streamerInfo['live_time']}</span>
+        <div style='margin-bottom:12px; display:flex; flex-direction:column; gap:5px;'>
+            <span style='color:#666; font-size:clamp(12px, 2.5vw, 14px);'>⏰ 开播时间：</span>
+            <span style='color:#333; font-size:clamp(13px, 2.8vw, 15px);'>{$streamerInfo['live_time']}</span>
         </div>
+    </div>";
+    $holidayName = isHoliday();
+    if ($holidayName) {
+        $solarTermsList = [
+            '立春', '雨水', '惊蛰', '春分', '清明', '谷雨',
+            '立夏', '小满', '芒种', '夏至', '小暑', '大暑',
+            '立秋', '处暑', '白露', '秋分', '寒露', '霜降',
+            '立冬', '小雪', '大雪', '冬至', '小寒', '大寒'
+        ];
+        if (in_array($holidayName, $solarTermsList)) {
+            $message .= "<div style='background:linear-gradient(135deg, #f6f8ff 0%, #f1f5ff 100%); 
+                padding:15px; 
+                border-radius:10px; 
+                margin-top:20px;
+                border-left:4px solid #00a1d6;'>
+                <p style='color:#555; margin:0; font-size:clamp(13px, 2.8vw, 15px);'>🌸 祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！</p>
+            </div>";
+        } else {
+            $message .= "<div style='background:linear-gradient(135deg, #fff6f6 0%, #fff1f1 100%); 
+                padding:15px; 
+                border-radius:10px; 
+                margin-top:20px;
+                border-left:4px solid #ff6b6b;'>
+                <p style='color:#555; margin:0; font-size:clamp(13px, 2.8vw, 15px);'>🎊 今天是{$holidayName}，别忘了祝主播{$streamerName}{$holidayName}快乐！</p>
+            </div>";
+        }
+    }
+    
+
+    $message .= 
+    "<div style='margin:20px 0;'>
+        <a href='https://live.bilibili.com/{$roomId}' style='text-decoration:none; 
+            display:block; 
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;'>
+            <img src='{$streamerInfo['user_cover']}' alt='直播间封面' 
+                style='width:100%; border-radius:12px; display:block; box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                pointer-events: none;'>
+        </a>
     </div>
+
 
     <div style='text-align:center; margin:20px 0;'>
         <a href='https://live.bilibili.com/{$roomId}' style='display:inline-block; 
@@ -275,48 +318,7 @@ try {
             -webkit-user-select: none;'>
             👉 立即观看直播
         </a>
-    </div>
-
-    <div style='margin:20px 0;'>
-        <a href='https://live.bilibili.com/{$roomId}' style='text-decoration:none; 
-            display:block; 
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;'>
-            <img src='{$streamerInfo['user_cover']}' alt='直播间封面' 
-                style='width:100%; border-radius:12px; display:block; box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                pointer-events: none;'>
-        </a>
     </div>";
-
-        $holidayName = isHoliday();
-        if ($holidayName) {
-            $solarTermsList = [
-                '立春', '雨水', '惊蛰', '春分', '清明', '谷雨',
-                '立夏', '小满', '芒种', '夏至', '小暑', '大暑',
-                '立秋', '处暑', '白露', '秋分', '寒露', '霜降',
-                '立冬', '小雪', '大雪', '冬至', '小寒', '大寒'
-            ];
-            if (in_array($holidayName, $solarTermsList)) {
-                $message .= "<div style='background:linear-gradient(135deg, #f6f8ff 0%, #f1f5ff 100%); 
-                    padding:15px; 
-                    border-radius:10px; 
-                    margin-top:20px;
-                    border-left:4px solid #00a1d6;'>
-                    <p style='color:#555; margin:0; font-size:15px;'>🌸 祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！</p>
-                </div>";
-            } else {
-                $message .= "<div style='background:linear-gradient(135deg, #fff6f6 0%, #fff1f1 100%); 
-                    padding:15px; 
-                    border-radius:10px; 
-                    margin-top:20px;
-                    border-left:4px solid #ff6b6b;'>
-                    <p style='color:#555; margin:0; font-size:15px;'>🎊 今天是{$holidayName}，别忘了祝主播{$streamerName}{$holidayName}快乐！</p>
-                </div>";
-            }
-        }
 
         $message .= "</div>";
         $emailSubject = "主播 $streamerName 开播通知";
