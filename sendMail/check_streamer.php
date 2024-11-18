@@ -241,21 +241,43 @@ try {
         $currentStatus = $streamerInfo['online'];
         logStatus($pdo, $roomId, $streamerName, $currentStatus); // 记录当前状态到数据库
         $lastStatus = getLastStatus($pdo, $roomId); // 从数据库获取上次状态
-        $message = "您关注的主播{$streamerName}已开播！<br><br>
-        <div style='max-width:100%; margin:0 auto;'>
-            <div style='font-size:16px; line-height:1.6;'>
-                <strong>直播标题:</strong> {$streamerInfo['title']}<br>
-                <strong>开播时间:</strong> {$streamerInfo['live_time']}<br>
-                <a href='https://live.bilibili.com/$roomId' style='color:#00a1d6; text-decoration:none;'>
-                    点击进入直播间 →
-                </a>
-            </div>
-            <div style='margin:15px 0;'>
-                <a href='https://live.bilibili.com/$roomId' style='text-decoration:none;'>
-                    <img src='{$streamerInfo['user_cover']}' alt='直播间封面' 
-                        style='width:100%; max-width:600px; height:auto; border-radius:8px; display:block;'>
-                </a>
-            </div>";
+        $message = "
+<div style='max-width:600px; margin:0 auto; font-family:Arial,sans-serif; background-color:#ffffff; padding:20px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.1);'>
+    <div style='text-align:center; margin-bottom:25px;'>
+        <h2 style='color:#00a1d6; margin:0;'>🎉 开播提醒 🎉</h2>
+        <p style='font-size:18px; color:#333; margin:10px 0;'>您关注的主播 <strong style='color:#00a1d6;'>{$streamerName}</strong> 已开播！</p>
+    </div>
+    
+    <div style='background-color:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px;'>
+        <div style='margin-bottom:12px;'>
+            <span style='color:#666;'>📺 直播标题：</span>
+            <span style='color:#333; font-weight:bold;'>{$streamerInfo['title']}</span>
+        </div>
+        <div style='margin-bottom:12px;'>
+            <span style='color:#666;'>⏰ 开播时间：</span>
+            <span style='color:#333;'>{$streamerInfo['live_time']}</span>
+        </div>
+    </div>
+
+    <div style='text-align:center; margin:20px 0;'>
+        <a href='https://live.bilibili.com/{$roomId}' style='display:inline-block; 
+            background-color:#00a1d6; 
+            color:#ffffff; 
+            padding:12px 30px; 
+            border-radius:25px; 
+            text-decoration:none;
+            font-weight:bold;
+            transition: all 0.3s ease;'>
+            👉 立即观看直播
+        </a>
+    </div>
+
+    <div style='margin:20px 0;'>
+        <a href='https://live.bilibili.com/{$roomId}' style='text-decoration:none; display:block;'>
+            <img src='{$streamerInfo['user_cover']}' alt='直播间封面' 
+                style='width:100%; border-radius:12px; display:block; box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
+        </a>
+    </div>";
 
         $holidayName = isHoliday();
         if ($holidayName) {
@@ -266,16 +288,24 @@ try {
                 '立冬', '小雪', '大雪', '冬至', '小寒', '大寒'
             ];
             if (in_array($holidayName, $solarTermsList)) {
-                $message .= "<div style='font-size:15px; color:#666; margin-top:15px; padding:10px; background:#f5f5f5; border-radius:5px;'>
-                    祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！
+                $message .= "<div style='background:linear-gradient(135deg, #f6f8ff 0%, #f1f5ff 100%); 
+                    padding:15px; 
+                    border-radius:10px; 
+                    margin-top:20px;
+                    border-left:4px solid #00a1d6;'>
+                    <p style='color:#555; margin:0; font-size:15px;'>🌸 祝您{$holidayName}快乐，愿您在这个节气里身体健康，万事如意！</p>
                 </div>";
             } else {
-                $message .= "<div style='font-size:15px; color:#666; margin-top:15px; padding:10px; background:#f5f5f5; border-radius:5px;'>
-                    今天是{$holidayName}，别忘了祝主播{$streamerName}{$holidayName}快乐！
+                $message .= "<div style='background:linear-gradient(135deg, #fff6f6 0%, #fff1f1 100%); 
+                    padding:15px; 
+                    border-radius:10px; 
+                    margin-top:20px;
+                    border-left:4px solid #ff6b6b;'>
+                    <p style='color:#555; margin:0; font-size:15px;'>🎊 今天是{$holidayName}，别忘了祝主播{$streamerName}{$holidayName}快乐！</p>
                 </div>";
             }
         }
-        
+
         $message .= "</div>";
         $emailSubject = "主播 $streamerName 开播通知";
         if ($currentStatus > 0 && $lastStatus == 0) {
