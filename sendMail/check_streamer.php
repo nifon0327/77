@@ -267,15 +267,27 @@ try {
             border-radius:25px; 
             text-decoration:none;
             font-weight:bold;
-            transition: all 0.3s ease;'>
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;'>
             👉 立即观看直播
         </a>
     </div>
 
     <div style='margin:20px 0;'>
-        <a href='https://live.bilibili.com/{$roomId}' style='text-decoration:none; display:block;'>
+        <a href='https://live.bilibili.com/{$roomId}' style='text-decoration:none; 
+            display:block; 
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;'>
             <img src='{$streamerInfo['user_cover']}' alt='直播间封面' 
-                style='width:100%; border-radius:12px; display:block; box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
+                style='width:100%; border-radius:12px; display:block; box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                pointer-events: none;'>
         </a>
     </div>";
 
